@@ -18,7 +18,7 @@
 
 1. Склонируйте репозиторий:
    
-   git clone https://github.com/your-repo/auth-service.git
+   git clone https://github.com/sergiologino/auth-service.git
    cd auth-service
    
 2. Настройте конфигурацию в application.yml (по необходимости):
