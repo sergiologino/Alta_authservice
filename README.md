@@ -12,7 +12,7 @@
 - **Java 17**
 - **Spring Boot 3**
 - **Gradle**
-- **H2 Database** (или другая база данных)
+- **Postgres Database**
 
 ## Установка и запуск
 
@@ -25,16 +25,16 @@
 3. Настройте конфигурацию в application.yml (по необходимости):
 
    jwt:
-   secret: your-secret-key
-   expiration:
-   access: 3600000  # 1 час
-   refresh: 86400000  # 1 день
+      secret: your-secret-key
+      expiration:
+         access: 3600000  # 1 час
+         refresh: 86400000  # 1 день
 
-4. Сборка и запуск:
+5. Сборка и запуск:
 
    ./gradlew bootRun
 
-5. Откройте Swagger для тестирования API:
+6. Откройте Swagger для тестирования API:
    URL: http://localhost:8081/swagger-ui.html
 
 API Документация
