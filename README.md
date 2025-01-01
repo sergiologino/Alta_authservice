@@ -18,7 +18,7 @@
 
 1. Склонируйте репозиторий:
    
-   git clone https://github.com/sergiologino/auth-service.git
+   git clone https://github.com/sergiologino/Alta_authservice.git
    
    cd auth-service
    
