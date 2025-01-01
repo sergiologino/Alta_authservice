@@ -19,9 +19,10 @@
 1. Склонируйте репозиторий:
    
    git clone https://github.com/sergiologino/auth-service.git
+   
    cd auth-service
    
-2. Настройте конфигурацию в application.yml (по необходимости):
+3. Настройте конфигурацию в application.yml (по необходимости):
 
    jwt:
    secret: your-secret-key
@@ -29,11 +30,11 @@
    access: 3600000  # 1 час
    refresh: 86400000  # 1 день
 
-3. Сборка и запуск:
+4. Сборка и запуск:
 
    ./gradlew bootRun
 
-4. Откройте Swagger для тестирования API:
+5. Откройте Swagger для тестирования API:
    URL: http://localhost:8081/swagger-ui.html
 
 API Документация
