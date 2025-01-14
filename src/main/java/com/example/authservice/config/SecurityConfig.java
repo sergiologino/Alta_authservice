@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 @Configuration
 public class SecurityConfig {
@@ -19,11 +21,23 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll() // Разрешить доступ к эндпоинтам авторизации
                         .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
                 )
-                .httpBasic(Customizer.withDefaults()); // Включение базовой аутентификации
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/dashboard")
+                        .failureUrl("/auth?error")
+                )
+                .logout(logout -> logout
+                        .logoutSuccessHandler(oidcLogoutSuccessHandler(null))
+                );
+
 
         return http.build();
     }
 
+
+    @Bean
+    public OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
+        return new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

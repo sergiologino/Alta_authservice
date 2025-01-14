@@ -6,6 +6,8 @@ import com.example.authservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000")
+@Tag(name = "Auth API", description = "API для регистрации и авторизации")
 @Tag(name = "Auth API", description = "API для регистрации и авторизации")
 public class AuthController {
 
@@ -47,5 +51,14 @@ public class AuthController {
                     return ResponseEntity.ok(tokens);
                 })
                 .orElse(ResponseEntity.status(401).build());
+    }
+
+    @RestController
+    public class OAuth2LoginController {
+
+        @GetMapping("/dashboard")
+        public String getDashboard(@AuthenticationPrincipal OAuth2User user) {
+            return "Добро пожаловать, " + user.getAttribute("name");
+        }
     }
 }
