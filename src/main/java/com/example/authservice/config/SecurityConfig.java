@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Отключение CSRF
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll() // Разрешить доступ к эндпоинтам авторизации
+                        .requestMatchers("/oauth2/**").permitAll() // Разрешаем доступ к Yandex OAuth
                         .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -50,26 +51,29 @@ public class SecurityConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000"); // Указываем разрешённый источник
         config.addAllowedMethod("*"); // Разрешаем все HTTP-методы
         config.addAllowedHeader("*"); // Разрешаем все заголовки
         config.setAllowCredentials(true); // Разрешаем использование cookie
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000"); // Указываем разрешённый источник
         config.addAllowedMethod("*"); // Разрешаем все HTTP-методы
         config.addAllowedHeader("*"); // Разрешаем все заголовки
         config.setAllowCredentials(true); // Разрешаем использование cookie
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return null;
+        return source;
     }
 
 

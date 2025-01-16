@@ -23,6 +23,8 @@ spring:
             token-uri: https://oauth.yandex.ru/token
             user-info-uri: https://login.yandex.ru/info
             user-name-attribute: id
+    password:
+      encoder-strength: 12
 
   datasource:
     url: jdbc:postgresql://localhost:5432/authdb

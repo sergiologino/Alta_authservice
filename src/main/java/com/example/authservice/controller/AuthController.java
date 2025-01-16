@@ -25,10 +25,13 @@ public class AuthController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final Map<String, String> stateStore = new HashMap<>();
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider) {
+
+    public AuthController(UserService userService, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
@@ -42,7 +45,7 @@ public class AuthController {
     @Operation(summary = "Авторизация пользователя", description = "Авторизация пользователя и выдача токенов")
     public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
         return userService.findByUsername(user.getUsername())
-                .filter(u -> jwtTokenProvider.validateToken(u.getPassword()))
+                .filter(u -> passwordEncoder.matches(user.getPassword(), u.getPassword()))
                 .map(u -> {
                     String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
                     String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
@@ -99,18 +102,3 @@ public class AuthController {
     }
 }
 
-//    @GetMapping("/login/oauth2/code/yandex")
-//    public ResponseEntity<String> handleOAuthCallback(@RequestParam("code") String code, @RequestParam("state") String state) {
-//        // Проверяем корректность state
-//        System.out.println("Полученные параметры: " + params);
-//        return ResponseEntity.ok("Параметры обработаны");
-//        if (!state.equals(savedState)) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid state parameter");
-//        }
-//
-//        // Обрабатываем полученный code
-//        String accessToken = exchangeCodeForAccessToken(code);
-//
-//        return ResponseEntity.ok("Авторизация успешна, токен: " + accessToken);
-//    }
-//}
