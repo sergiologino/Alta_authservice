@@ -3,8 +3,13 @@ package com.example.authservice.controller;
 import com.example.authservice.config.JwtTokenProvider;
 import com.example.authservice.model.User;
 import com.example.authservice.service.UserService;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -15,6 +20,7 @@ import java.util.Base64;
 import java.util.UUID;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -82,6 +88,25 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+//    @GetMapping("/login/oauth2/code/yandex")
+//    @Operation(summary = "Обработка редиректа от Яндекса")
+//    public ResponseEntity<String> handleYandexCallback(
+//            @RequestParam("code") String code,
+//            @RequestParam("state") String state) {
+//        if (!stateStore.containsKey(state)) {
+//            return ResponseEntity.badRequest().body("Invalid state parameter");
+//        }
+//        System.out.println("Обработка редиректа от Яндекса ");
+//        System.out.println("code "+code);
+//        System.out.println("state "+state);
+//
+//        // Удаляем state, чтобы избежать повторного использования
+//        stateStore.remove(state);
+//
+//        // Используйте полученный `code` для запроса accessToken и данных пользователя
+//        return ResponseEntity.ok("Callback обработан успешно");
+//    }
+
     @GetMapping("/login/oauth2/code/yandex")
     @Operation(summary = "Обработка редиректа от Яндекса")
     public ResponseEntity<String> handleYandexCallback(
@@ -90,15 +115,34 @@ public class AuthController {
         if (!stateStore.containsKey(state)) {
             return ResponseEntity.badRequest().body("Invalid state parameter");
         }
-        System.out.println("Обработка редиректа от Яндекса ");
-        System.out.println("code "+code);
-        System.out.println("state "+state);
 
         // Удаляем state, чтобы избежать повторного использования
         stateStore.remove(state);
 
-        // Используйте полученный `code` для запроса accessToken и данных пользователя
-        return ResponseEntity.ok("Callback обработан успешно");
+        // Отправляем запрос на получение accessToken
+        RestTemplate restTemplate = new RestTemplate();
+        String tokenUri = "https://oauth.yandex.ru/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "authorization_code");
+        body.add("code", code);
+        body.add("client_id", "a0bc7b7381a84739be01111f12d9447e");
+        body.add("client_secret", "c0701b6fad07403c8a8b6f9e99874e1f");
+        body.add("redirect_uri", "http://localhost:8081/login/oauth2/code/yandex");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        System.out.println("Запрос на Яндекс: "+request);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, request, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok("Токен успешно получен: " + response.getBody());
+        } else {
+            return ResponseEntity.status(response.getStatusCode()).body("Ошибка получения токена");
+        }
     }
 }
 
